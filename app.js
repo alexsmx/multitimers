@@ -976,11 +976,100 @@ document.getElementById('fab-create').addEventListener('click', () => {
   setTimeout(() => document.getElementById('timer-name').focus(), 400);
 });
 
+// ==================== Service Worker & PWA ====================
+let swRegistration = null;
+
+async function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    try {
+      swRegistration = await navigator.serviceWorker.register('./sw.js');
+      console.log('[SW] Registered successfully');
+    } catch (e) {
+      console.error('[SW] Registration failed:', e);
+    }
+  }
+}
+
+function scheduleSwNotification(title, body, delayMs) {
+  if (swRegistration && swRegistration.active) {
+    swRegistration.active.postMessage({
+      type: 'SCHEDULE_NOTIFICATION',
+      title,
+      body,
+      delay: delayMs
+    });
+  }
+}
+
+// ==================== Wake Lock (keep screen on) ====================
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (e) {
+      console.log('[WakeLock] Could not acquire:', e.message);
+    }
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+}
+
+// Re-acquire wake lock and recalc timers when page becomes visible
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    const anyRunning = timers.some(t => t.isRunning);
+    if (anyRunning) requestWakeLock();
+
+    // Recalculate all running timers on return from background
+    timers.forEach(t => {
+      if (t.isRunning && t.targetEndTime) {
+        const rem = (t.targetEndTime - Date.now()) / 1000;
+        if (rem <= 0) {
+          t.complete();
+        } else {
+          t.remainingSeconds = rem;
+        }
+      }
+    });
+    renderTimers();
+  }
+});
+
+// Hook into timer start to schedule SW notification + wake lock
+const _origTimerStart = Timer.prototype.start;
+Timer.prototype.start = function() {
+  _origTimerStart.call(this);
+  requestWakeLock();
+  if (this.remainingSeconds > 0) {
+    scheduleSwNotification(
+      'Timer Complete!',
+      `${this.name} has finished!`,
+      this.remainingSeconds * 1000
+    );
+  }
+};
+
+// Release wake lock when all timers stop
+const _origTimerPause = Timer.prototype.pause;
+Timer.prototype.pause = function() {
+  _origTimerPause.call(this);
+  if (!timers.some(t => t.isRunning)) releaseWakeLock();
+};
+
 // ==================== Init ====================
 loadState();
 initCollapsible();
 renderTemplates();
 renderTimers();
 renderLogs();
+registerServiceWorker();
 requestNotificationPermission();
 checkIdleState();
