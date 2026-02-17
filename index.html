@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&#x23F3; Multi Timer - No active timers</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>&#x23F3; Multi Timer</h1>
+    <p>Run multiple countdown timers simultaneously</p>
+  </header>
+
+  <!-- Active Timers -->
+  <section class="section" id="timers-section">
+    <h2>&#x23F1;&#xFE0F; Active Timers</h2>
+    <div class="timers-grid" id="timers-grid"></div>
+    <p class="empty-state" id="timers-empty">No active timers. Create one above to get started!</p>
+  </section>
+
+  <!-- Templates Section -->
+  <section class="section collapsible" id="templates-section">
+    <h2 class="section-toggle" data-target="templates-body">&#x1F4C1; Templates <span class="chevron"></span></h2>
+    <div class="section-body" id="templates-body">
+      <div class="templates-grid" id="templates-grid"></div>
+      <p class="empty-state" id="templates-empty">No templates saved yet. Create a timer and save it as a template!</p>
+    </div>
+  </section>
+
+  <!-- Timer Creation -->
+  <section class="section collapsible" id="create-section">
+    <h2 class="section-toggle" data-target="create-body">&#x23F1;&#xFE0F; Create Timer <span class="chevron"></span></h2>
+    <div class="section-body" id="create-body">
+      <div class="form-row">
+        <div class="form-group" style="flex:1;min-width:180px">
+          <label for="timer-name">Timer Name</label>
+          <input type="text" id="timer-name" maxlength="30" placeholder="Timer">
+        </div>
+        <div class="form-group">
+          <label for="timer-minutes">Minutes</label>
+          <input type="number" id="timer-minutes" min="0" max="999" value="5">
+        </div>
+        <div class="form-group">
+          <label for="timer-seconds">Seconds</label>
+          <input type="number" id="timer-seconds" min="0" max="59" value="0">
+        </div>
+      </div>
+
+      <div class="presets">
+        <button class="preset-btn" data-minutes="0" data-seconds="30">30 sec</button>
+        <button class="preset-btn" data-minutes="1" data-seconds="0">1 min</button>
+        <button class="preset-btn" data-minutes="3" data-seconds="0">3 min</button>
+        <button class="preset-btn" data-minutes="5" data-seconds="0">5 min</button>
+        <button class="preset-btn" data-minutes="10" data-seconds="0">10 min</button>
+        <button class="preset-btn" data-minutes="15" data-seconds="0">15 min</button>
+        <button class="preset-btn" data-minutes="30" data-seconds="0">30 min</button>
+        <button class="preset-btn pomodoro" data-minutes="25" data-seconds="0" data-pomodoro="true" data-break-min="5" data-break-sec="0">&#x1F345; Pomodoro</button>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="pomodoro-mode">
+        <label for="pomodoro-mode">&#x1F345; Enable Pomodoro cycle mode</label>
+      </div>
+      <div class="break-inputs hidden" id="break-inputs">
+        <div class="form-group">
+          <label for="break-minutes">Break Minutes</label>
+          <input type="number" id="break-minutes" min="0" max="999" value="5">
+        </div>
+        <div class="form-group">
+          <label for="break-seconds">Break Seconds</label>
+          <input type="number" id="break-seconds" min="0" max="59" value="0">
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="auto-start" checked>
+        <label for="auto-start">Auto-start timer upon creation</label>
+      </div>
+
+      <h3 style="margin-bottom:8px;font-size:1rem">&#x1F50A; Alert Sound</h3>
+      <div class="sound-options">
+        <div class="sound-option"><input type="radio" name="sound" id="sound-beep" value="beep" checked><label for="sound-beep">&#x1F514; Beep</label></div>
+        <div class="sound-option"><input type="radio" name="sound" id="sound-chime" value="chime"><label for="sound-chime">&#x1F3B5; Chime</label></div>
+        <div class="sound-option"><input type="radio" name="sound" id="sound-bell" value="bell"><label for="sound-bell">&#x1F514; Bell</label></div>
+        <div class="sound-option"><input type="radio" name="sound" id="sound-alarm" value="alarm"><label for="sound-alarm">&#x23F0; Alarm</label></div>
+        <div class="sound-option"><input type="radio" name="sound" id="sound-gentle" value="gentle"><label for="sound-gentle">&#x1F3B6; Gentle</label></div>
+        <div class="sound-option"><input type="radio" name="sound" id="sound-digital" value="digital"><label for="sound-digital">&#x1F4BB; Digital</label></div>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="create-timer-btn">&#x23F1;&#xFE0F; Create Timer</button>
+        <button class="btn btn-save" id="save-template-btn">&#x1F4BE; Save Current Settings as Template</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pomodoro Activity Log -->
+  <section class="section" id="log-section">
+    <h2>&#x1F4DD; Pomodoro Activity Log</h2>
+    <div class="log-input">
+      <textarea id="log-description" placeholder="What are you working on? e.g., Reviewed project documentation, Completed coding sprint..."></textarea>
+      <button class="btn btn-primary" id="log-activity-btn">&#x1F4DD; Log Activity</button>
+    </div>
+    <div class="log-actions">
+      <button class="btn btn-secondary" id="download-log-btn">&#x1F4E5; Download Log</button>
+      <button class="btn btn-danger" id="clear-logs-btn">&#x1F5D1;&#xFE0F; Clear All Logs</button>
+      <button class="btn btn-secondary" id="reset-cycles-btn">&#x1F504; Reset All Cycles</button>
+    </div>
+    <div class="log-entries" id="log-entries"></div>
+    <p class="empty-state" id="logs-empty">No activity logged yet. Start tracking your pomodoros above!</p>
+  </section>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Mobile FAB -->
+<button class="fab" id="fab-create" title="Create Timer">+</button>
+
+<script src="app.js"></script>
+</body>
+</html>
