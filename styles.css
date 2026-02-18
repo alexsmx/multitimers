@@ -414,7 +414,11 @@ header p { opacity: .85; font-size: 1rem; }
 
 /* ========== Responsive ========== */
 @media (max-width: 768px) {
-  body { padding: 10px; }
+  body {
+    padding: 10px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
   header h1 { font-size: 1.8rem; }
 
   .container {
