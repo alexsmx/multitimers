@@ -1064,6 +1064,29 @@ Timer.prototype.pause = function() {
   if (!timers.some(t => t.isRunning)) releaseWakeLock();
 };
 
+// ==================== Update App ====================
+document.getElementById('update-app-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('update-app-btn');
+  btn.textContent = 'Updating...';
+  btn.disabled = true;
+  try {
+    // Delete all caches
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    // Unregister service worker so it re-installs fresh
+    if (swRegistration) {
+      await swRegistration.unregister();
+    }
+    showToast('Cache cleared! Reloading...', 'success');
+    setTimeout(() => location.reload(true), 500);
+  } catch (e) {
+    console.error('Update failed:', e);
+    showToast('Update failed. Try again.', 'error');
+    btn.textContent = '\uD83D\uDD04 Update App';
+    btn.disabled = false;
+  }
+});
+
 // ==================== Init ====================
 loadState();
 initCollapsible();
